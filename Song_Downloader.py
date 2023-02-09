@@ -5,7 +5,12 @@ from tkinter import ttk
 
 
 def main():
+    create_window()
+
+
+def create_window():
     window = tk.Tk()
+    window.iconbitmap("Icon.ico")
     window.title("Youtube To MP3 Downloader")
 
     # Window Sizes
@@ -44,7 +49,8 @@ def main():
     label = tk.Label(window, text="Insert Youtube Link")
     label.grid(row=2, column=0, columnspan=2, sticky=tk.N, pady=10)
 
-    button = ttk.Button(window, text="Download", command=lambda: [song_downloader(entry, label), entry.delete(0, tk.END)])
+    button = ttk.Button(window, text="Download", command=lambda: [song_downloader(entry, label),
+                                                                  entry.delete(0, tk.END)])
     button.grid(row=1, column=0, columnspan=2, sticky=tk.N, pady=5)
 
     window.bind("<Return>", lambda event: button.invoke())
@@ -63,7 +69,7 @@ def song_downloader(entry, label):
         video_stream = yt_link.streams.filter(only_audio=True).first()
         video_filename = os.path.join(download_folder, video_stream.default_filename)
 
-        # Checks if the file already exists, otherwise it downloads it again as a mp4 file
+        # Checks if the file already exists, otherwise it would download it again as a mp4 file
         if os.path.exists(video_filename.replace(".mp4", ".mp3")):
             raise FileExistsError("File already exists.")
 
