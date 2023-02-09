@@ -23,8 +23,10 @@ def main():
     # Grid configs
     window.columnconfigure(0, weight=1)
     window.columnconfigure(1, weight=1)
+    window.columnconfigure(2, weight=0)
     window.rowconfigure(0, weight=2)
-    window.rowconfigure(1, weight=1)
+    window.rowconfigure(1, weight=0)
+    window.rowconfigure(2, weight=1)
 
     # Widget Styles
     style = ttk.Style()
@@ -39,13 +41,17 @@ def main():
     entry = ttk.Entry(window)
     entry.grid(row=0, column=0, columnspan=2, ipadx=100, ipady=3, sticky=tk.S)
 
-    button = ttk.Button(window, text="Download", command=lambda: [song_downloader(entry), entry.delete(0, tk.END)])
+    label = tk.Label(window, text="Insert Youtube Link")
+    label.grid(row=2, column=0, columnspan=2, sticky=tk.N, pady=10)
+
+    button = ttk.Button(window, text="Download", command=lambda: [song_downloader(entry, label), entry.delete(0, tk.END)])
     button.grid(row=1, column=0, columnspan=2, sticky=tk.N, pady=5)
 
+    window.bind("<Return>", lambda event: button.invoke())
     window.mainloop()
 
 
-def song_downloader(entry):
+def song_downloader(entry, label):
     url = entry.get()
     desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
     download_folder = os.path.join(desktop, "Downloaded_Songs")
@@ -54,22 +60,25 @@ def song_downloader(entry):
         os.makedirs(download_folder)
     try:
         yt_link = yt(url)
-
         video_stream = yt_link.streams.filter(only_audio=True).first()
         video_filename = os.path.join(download_folder, video_stream.default_filename)
-        video_stream.download(download_folder)
 
+        # Checks if the file already exists, otherwise it downloads it again as a mp4 file
+        if os.path.exists(video_filename.replace(".mp4", ".mp3")):
+            raise FileExistsError("File already exists.")
+
+        video_stream.download(download_folder)
         os.rename(video_filename, video_filename.replace(".mp4", ".mp3"))
 
-        print("The song has been successfully downloaded!")
+        label.config(text="The Song Has Been Successfully Downloaded!")
 
     except FileExistsError:
-        print("Cannot create file, because the same file already exists!")
+        label.config(text="This Song Already Exists In The File")
     except Exception as e:
         if str(e) == 'regex_search: could not find match for (?:v=|\/)([0-9A-Za-z_-]{11}).*':
-            print("Sorry, that is an incorrect link")
+            label.config(text="Invalid Link")
         else:
-            print("Something went wrong!")
+            label.config(text="An Unexpected Error Occurred")
             print(f"An error occurred: {e}")
             raise e
 
