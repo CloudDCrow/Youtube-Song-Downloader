@@ -1,7 +1,9 @@
 import os
+import sys
 from pytube import YouTube as yt
 import tkinter as tk
 from tkinter import ttk
+from PIL import Image, ImageTk
 
 
 def main():
@@ -10,7 +12,8 @@ def main():
 
 def create_window():
     window = tk.Tk()
-    window.iconbitmap("Icon.ico")
+    icon = Image.open(resource_path("Images/Icon.png"))
+    window.iconphoto(True, ImageTk.PhotoImage(icon))
     window.title("Youtube To MP3 Downloader")
 
     # Window Sizes
@@ -38,7 +41,8 @@ def create_window():
     style.theme_use('clam')
 
     # Background Image and Widgets
-    background_image = tk.PhotoImage(file="Music_Background.jpg")
+    background_image = Image.open(resource_path("Images/Music_Background.jpg"))
+    background_image = ImageTk.PhotoImage(background_image)
 
     background_label = tk.Label(window, image=background_image)
     background_label.place(relwidth=1, relheight=1, relx=0, rely=0)
@@ -87,6 +91,17 @@ def song_downloader(entry, label):
             label.config(text="An Unexpected Error Occurred")
             print(f"An error occurred: {e}")
             raise e
+
+
+# This Code is only for creating the exe file, can be ignored
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        path = getattr(sys, '_MEIPASS', os.getcwd())
+    except AttributeError:
+        path = os.path.abspath(".")
+
+    return os.path.join(path, relative_path)
 
 
 if __name__ == '__main__':
