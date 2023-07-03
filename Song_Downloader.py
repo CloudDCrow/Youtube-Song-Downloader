@@ -68,10 +68,12 @@ def song_downloader(entry, label):
 
     if not os.path.exists(download_folder):
         os.makedirs(download_folder)
+        print("Making new folder on desktop")
     try:
         yt_link = yt(url)
         video_stream = yt_link.streams.filter(only_audio=True).first()
         video_filename = os.path.join(download_folder, video_stream.default_filename)
+        print("Adding song to folder")
 
         # Checks if the file already exists, otherwise it would download it again as a mp4 file
         if os.path.exists(video_filename.replace(".mp4", ".mp3")):
@@ -81,12 +83,15 @@ def song_downloader(entry, label):
         os.rename(video_filename, video_filename.replace(".mp4", ".mp3"))
 
         label.config(text="The Song Has Been Successfully Downloaded!")
+        print("Song downloaded")
 
     except FileExistsError:
         label.config(text="This Song Already Exists In The File")
+        print("Song already exists")
     except Exception as e:
         if str(e) == 'regex_search: could not find match for (?:v=|\/)([0-9A-Za-z_-]{11}).*':
             label.config(text="Invalid Link")
+            print("Not a valid link")
         else:
             label.config(text="An Unexpected Error Occurred")
             print(f"An error occurred: {e}")
